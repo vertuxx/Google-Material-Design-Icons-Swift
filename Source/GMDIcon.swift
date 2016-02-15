@@ -90,6 +90,44 @@ public extension UIBarButtonItem {
     }
 }
 
+// Original idea from https://github.com/thii/FontAwesome.swift/blob/master/FontAwesome/FontAwesome.swift
+public extension UIImageView {
+
+    /**
+     Create UIImage from GMDType
+     */
+
+    public func setGMDIconWithName(icon: GMDType, textColor: UIColor, backgroundColor: UIColor = UIColor.clearColor()) {
+
+        self.image = UIImage(icon: icon, size: frame.size, textColor: textColor, backgroundColor: backgroundColor)
+    }
+}
+
+public extension UIImage {
+
+    public convenience init(icon: GMDType, size: CGSize, textColor: UIColor = UIColor.blackColor(), backgroundColor: UIColor = UIColor.clearColor()) {
+
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.alignment = NSTextAlignment.Center
+
+        // Taken from FontAwesome.io's Fixed Width Icon CSS
+        let fontAspectRatio: CGFloat = 1.28571429
+        let fontSize = min(size.width / fontAspectRatio, size.height)
+
+        FontLoader.loadFontIfNeeded()
+        let font = UIFont(name: GMDStruct.FontName, size: fontSize)
+        assert(font != nil, GMDStruct.ErrorAnnounce)
+        let attributes = [NSFontAttributeName: font!, NSForegroundColorAttributeName: textColor, NSBackgroundColorAttributeName: backgroundColor, NSParagraphStyleAttributeName: paragraph]
+
+        let attributedString = NSAttributedString(string: icon.text!, attributes: attributes)
+        UIGraphicsBeginImageContextWithOptions(size, false , 0.0)
+        attributedString.drawInRect(CGRectMake(0, (size.height - fontSize) / 2, size.width, fontSize))
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        self.init(CGImage: image.CGImage!, scale: image.scale, orientation: image.imageOrientation)
+    }
+}
+
 private struct GMDStruct {
     
     static let FileFontName = "GMDIcons"
